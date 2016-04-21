@@ -15,6 +15,7 @@ fi
 
 function fix_dockerfile_version() {
   sed "s#FROM ubirch/java#FROM ubirch/java:v${GO_DEPENDENCY_LABEL_JAVA_BASE_CONTAINER}#g" Dockerfile > Dockerfile.v${GO_PIPELINE_LABEL}
+  diff Dockerfile Dockerfile.v${GO_PIPELINE_LABEL}
 }
 
 # build the docker container
