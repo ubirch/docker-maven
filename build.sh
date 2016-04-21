@@ -3,7 +3,8 @@
 # check out out GO tools
 git clone https://github.com/ubirch/go-tools.git
 
-$if [ $? -ne 0 ]; then exit 1
+if [ $? -ne 0 ]; then exit 1; fi
+
 
 # calculate our new label for the version string
 NEW_LABEL=`./go-tools/concat-labels.sh`
