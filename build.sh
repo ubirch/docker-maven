@@ -24,12 +24,15 @@ function fetch_got-tools() {
       # update the existing repo
       cd go-tools
       git pull
+      if [ $? -ne 0 ]; then exit 1; fi
+      cd ..
     else
       # check out out GO tools
       git clone https://github.com/ubirch/go-tools.git
+      if [ $? -ne 0 ]; then exit 1; fi
     fi
 
-    if [ $? -ne 0 ]; then exit 1; fi
+
 }
 
 function init() {
