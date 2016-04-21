@@ -1,5 +1,14 @@
 #!/bin/bash -x
 
+# check out out GO tools
+git clone https://github.com/ubirch/go-tools.git
+
+$if [ $? -ne 0 ]; then exit 1
+
+# calculate our new label for the version string
+NEW_LABEL=`./go-tools/concat-labels.sh`
+
+
 if [ -f VAR/JAVA_VERSION ]; then
   export JAVA_VERSION=`cat VAR/JAVA_VERSION`
 fi
@@ -16,7 +25,7 @@ fi
 echo "Building Maven container with JAVA_VERSION=${JAVA_VERSION} JAVA_UPDATE=${JAVA_UPDATE} JAVA_BUILD=${JAVA_BUILD}"
 
 mkdir -p VAR && docker build --build-arg JAVA_VERSION=${JAVA_VERSION:=8} \
-  -t ubirch/maven-build .
+  -t ubirch/maven-build:v${NEW_LABEL} .
 
 
 if [ $? -eq 0 ]; then
