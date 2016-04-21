@@ -29,12 +29,18 @@ function init() {
   NEW_LABEL=`./go-tools/concat-labels.sh`
 }
 
+function fix_dockerfile_version() {
+  sed "s#FROM ubirch/java#FROM ubirch/java:v${GO_DEPENDENCY_LABEL_JAVA_BASE_CONTAINER}#g" Dockerfile > Dockerfile.v${NEW_LABEL}
+}
+
 # build the docker container
 function build_container() {
 
+    fix_dockerfile_version
+
     echo "Building Maven container with JAVA_VERSION=${JAVA_VERSION} JAVA_UPDATE=${JAVA_UPDATE} JAVA_BUILD=${JAVA_BUILD}"
 
-    mkdir -p VAR && docker build --build-arg JAVA_VERSION=${JAVA_VERSION:=8} -t ubirch/maven-build:v${NEW_LABEL} .
+    mkdir -p VAR && docker build --build-arg JAVA_VERSION=${JAVA_VERSION:=8} -t ubirch/maven-build:v${NEW_LABEL} -f Dockerfile.v${NEW_LABEL} .
 
 
     if [ $? -eq 0 ]; then
