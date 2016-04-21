@@ -33,6 +33,8 @@ if [ $? -eq 0 ]; then
     echo ${JAVA_VERSION:=8} > VAR/JAVA_VERSION
     echo ${JAVA_UPDATE:=77} > VAR/JAVA_UPDATE
     echo ${JAVA_BUILD:=03} > VAR/JAVA_BUILD
+    echo ${NEW_LABEL} > VAR/BUILD_LABEL
+    echo ${NEW_LABEL} > VAR/GO_PIPELINE_NAME_${GO_PIPELINE_NAME}
 else
     echo "Docker build failed"
     exit 1
