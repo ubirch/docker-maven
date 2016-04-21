@@ -1,4 +1,4 @@
-FROM ubirch/java:v8
+FROM ubirch/java
 MAINTAINER Falko Zurell <falko.zurell@ubirch.com>
 
 ARG JAVA_VERSION=8
