@@ -19,8 +19,15 @@ if [ -f VAR/JAVA_UPDATE ]; then
 fi
 
 function fetch_got-tools() {
-    # check out out GO tools
-    git clone https://github.com/ubirch/go-tools.git
+
+    if [ -d go-tools ]; then
+      # update the existing repo
+      cd go-tools
+      git pull
+    else
+      # check out out GO tools
+      git clone https://github.com/ubirch/go-tools.git
+    fi
 
     if [ $? -ne 0 ]; then exit 1; fi
 }
