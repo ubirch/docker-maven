@@ -16,6 +16,8 @@ RUN update-alternatives --install "/usr/bin/java" "java" "${JAVA_HOME}/bin/java"
     update-alternatives --set javaws "${JAVA_HOME}/bin/javaws" && \
     update-alternatives --set javac "${JAVA_HOME}/bin/javac"
 
+RUN git config --system user.name Docker && git config --system user.email docker@localhost
+
 RUN mkdir /build && mkdir /maven-repo
 VOLUME /build /maven-repo
 WORKDIR /build
