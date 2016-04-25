@@ -43,7 +43,7 @@ function build_container() {
 # publish the new docker container
 function publish_container() {
   echo "Publishing Docker Container with version: ${GO_PIPELINE_LABEL}"
-  docker push ubirch/maven-build:v${GO_PIPELINE_LABEL}
+  docker push ubirch/maven-build:v${GO_PIPELINE_LABEL} && docker push ubirch/maven-build
 
   if [ $? -eq 0 ]; then
     echo ${NEW_LABEL} > VAR/GO_PIPELINE_NAME_${GO_PIPELINE_NAME}
