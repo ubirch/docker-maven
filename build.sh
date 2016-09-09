@@ -14,7 +14,12 @@ if [ -f VAR/JAVA_UPDATE ]; then
 fi
 
 function fix_dockerfile_version() {
-  sed "s#FROM ubirch/java#FROM ubirch/java:v${GO_DEPENDENCY_LABEL_JAVA_BASE_CONTAINER}#g" Dockerfile > Dockerfile.v${GO_PIPELINE_LABEL}
+  if [ "v${GO_DEPENDENCY_LABEL_JAVA_BASE_CONTAINER}" = "v" ]; then
+    CONTAINER_LABEL=latest
+  else
+    CONTAINER_LABEL="v${GO_DEPENDENCY_LABEL_JAVA_BASE_CONTAINER}"
+  fi
+  sed "s#FROM ubirch/java#FROM ubirch/java:${CONTAINER_LABEL}#g" Dockerfile > Dockerfile.v${GO_PIPELINE_LABEL}
   diff Dockerfile Dockerfile.v${GO_PIPELINE_LABEL}
 }
 
@@ -25,7 +30,7 @@ function build_container() {
 
     echo "Building Maven container with JAVA_VERSION=${JAVA_VERSION} JAVA_UPDATE=${JAVA_UPDATE} JAVA_BUILD=${JAVA_BUILD}"
 
-    mkdir -p VAR && docker build --build-arg JAVA_VERSION=${JAVA_VERSION:=8} -t ubirch/maven-build:v${GO_PIPELINE_LABEL} -f Dockerfile.v${GO_PIPELINE_LABEL} .
+    mkdir -p VAR && docker build --build-arg JAVA_VERSION=${JAVA_VERSION:=8} --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` -t ubirch/maven-build:v${GO_PIPELINE_LABEL} -f Dockerfile.v${GO_PIPELINE_LABEL} .
 
 
     if [ $? -eq 0 ]; then
