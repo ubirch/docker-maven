@@ -17,7 +17,7 @@ MAINTAINER Falko Zurell <falko.zurell@ubirch.com>
 
 LABEL description="uBirch Maven build container"
 RUN apt-get update
-RUN apt-get --fix-missing install openjdk-8-jdk
+RUN apt-get --fix-missing install openjdk-8-jdk -y
 RUN apt-get --fix-missing install maven git -y && \
     apt-get autoclean && apt-get --purge -y autoremove && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
