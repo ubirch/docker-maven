@@ -11,7 +11,7 @@ function test_maven() {
     rm -rf ./my-app/
   fi
 
-  docker run -ti -v${PWD}:/build ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+  docker run -v${PWD}:/build ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
 
   if [ ! $? -eq 0 ]; then
       echo "Maven generate archetype failed"
@@ -30,7 +30,7 @@ function test_maven() {
     exit 1
   fi
 
-  docker run -ti -v${PWD}/my-app:/build ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} package
+  docker run -v${PWD}/my-app:/build ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} package
   if [ ! $? -eq 0 ]; then
       echo "Maven package failed"
       exit 1
