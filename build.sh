@@ -85,7 +85,7 @@ case "$1" in
       test_maven
       ;;
     *)
-        echo "Usage: $0 {build|publish}"
+        echo "Usage: $0 {build|publish|test}"
         exit 1
 esac
 
