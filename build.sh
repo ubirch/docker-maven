@@ -1,62 +1,56 @@
 #!/bin/bash -x
 
 
-if [ -f VAR/JAVA_VERSION ]; then
-  export JAVA_VERSION=`cat VAR/JAVA_VERSION`
-fi
 
-if [ -f VAR/JAVA_BUILD ]; then
-  export JAVA_BUILD=`cat VAR/JAVA_BUILD`
-fi
-
-if [ -f VAR/JAVA_UPDATE ]; then
-  export JAVA_UPDATE=`cat VAR/JAVA_UPDATE`
-fi
-
-
+# call maven to create a default project to check base functionality
+# https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html
 function test_maven() {
 
-  docker run -ti -v${PWD}:/build ubirch/maven-build:v${GO_PIPELINE_LABEL} archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+  # delete artefact from previous run
+  if [ -d ./my-app/ ]; then
+    rm -rf ./my-app/
+  fi
+
+  docker run -ti -v${PWD}:/build ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
 
   if [ ! $? -eq 0 ]; then
-      echo "Docker build failed"
+      echo "Maven generate archetype failed"
       exit 1
   fi
 
+  # check whether pom.xml has been created by Maven
   if [ ! -f ${PWD}/my-app/pom.xml ]; then
     echo "Test failed: pom.xml missing"
     exit 1
   fi
+
+  # check whether Java Source file has been created by maven
   if [ ! -f ${PWD}/my-app/src/main/java/com/mycompany/app/App.java ]; then
     echo "Test failed: ${PWD}/my-app/src/main/java/com/mycompany/app/App.java missing"
     exit 1
   fi
+
+  docker run -ti -v${PWD}/my-app:/build ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} package
+  if [ ! $? -eq 0 ]; then
+      echo "Maven package failed"
+      exit 1
+  fi
+
 }
 
-function fix_dockerfile_version() {
-  if [ "v${GO_DEPENDENCY_LABEL_JAVA_BASE_CONTAINER}" = "v" ]; then
-    CONTAINER_LABEL=latest
-  else
-    CONTAINER_LABEL="v${GO_DEPENDENCY_LABEL_JAVA_BASE_CONTAINER}"
-  fi
-  sed "s#FROM ubirch/java#FROM ubirch/java:${CONTAINER_LABEL}#g" Dockerfile > Dockerfile.v${GO_PIPELINE_LABEL}
-  diff Dockerfile Dockerfile.v${GO_PIPELINE_LABEL}
-}
+
 
 # build the docker container
 function build_container() {
 
     fix_dockerfile_version
 
-    echo "Building Maven container with JAVA_VERSION=${JAVA_VERSION} JAVA_UPDATE=${JAVA_UPDATE} JAVA_BUILD=${JAVA_BUILD}"
+    echo "Building Maven container with OpenJDK 8"
 
-    mkdir -p VAR && docker build --build-arg JAVA_VERSION=${JAVA_VERSION:=8} --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` -t ubirch/maven-build:v${GO_PIPELINE_LABEL} -f Dockerfile.v${GO_PIPELINE_LABEL} .
+    mkdir -p VAR && docker build --build-arg VCS_REF=`git rev-parse --short HEAD` --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` -t ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} -f Dockerfile .
 
 
     if [ $? -eq 0 ]; then
-        echo ${JAVA_VERSION:=8} > VAR/JAVA_VERSION
-        echo ${JAVA_UPDATE:=77} > VAR/JAVA_UPDATE
-        echo ${JAVA_BUILD:=03} > VAR/JAVA_BUILD
         echo ${NEW_LABEL} > VAR/${GO_PIPELINE_NAME}_${GO_STAGE_NAME}
     else
         echo "Docker build failed"
@@ -68,7 +62,7 @@ function build_container() {
 # publish the new docker container
 function publish_container() {
   echo "Publishing Docker Container with version: ${GO_PIPELINE_LABEL}"
-  docker push ubirch/maven-build:v${GO_PIPELINE_LABEL} && docker push ubirch/maven-build
+  docker push ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} && docker push ubirch/maven-build
 
   if [ $? -eq 0 ]; then
     echo ${NEW_LABEL} > VAR/GO_PIPELINE_NAME_${GO_PIPELINE_NAME}
