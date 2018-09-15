@@ -13,6 +13,26 @@ if [ -f VAR/JAVA_UPDATE ]; then
   export JAVA_UPDATE=`cat VAR/JAVA_UPDATE`
 fi
 
+
+function test_maven() {
+
+  docker run -ti -v${PWD}:/build ubirch/maven-build:v${GO_PIPELINE_LABEL} archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+  if [ ! $? -eq 0 ]; then
+      echo "Docker build failed"
+      exit 1
+  fi
+
+  if [ ! -f ${PWD}/my-app/pom.xml ]; then
+    echo "Test failed: pom.xml missing"
+    exit 1
+  fi
+  if [ ! -f ${PWD}/my-app/src/main/java/com/mycompany/app/App.java ]; then
+    echo "Test failed: ${PWD}/my-app/src/main/java/com/mycompany/app/App.java missing"
+    exit 1
+  fi
+}
+
 function fix_dockerfile_version() {
   if [ "v${GO_DEPENDENCY_LABEL_JAVA_BASE_CONTAINER}" = "v" ]; then
     CONTAINER_LABEL=latest
@@ -67,6 +87,9 @@ case "$1" in
     publish)
         publish_container
         ;;
+    test)
+      test_maven
+      ;;
     *)
         echo "Usage: $0 {build|publish}"
         exit 1
