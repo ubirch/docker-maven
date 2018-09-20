@@ -1,5 +1,4 @@
-FROM alpine:3.7
-
+FROM debian:stretch
 MAINTAINER Falko Zurell <falko.zurell@ubirch.com>
 
 # Build-time metadata as defined at http://label-schema.org
@@ -17,9 +16,11 @@ MAINTAINER Falko Zurell <falko.zurell@ubirch.com>
 
 
 LABEL description="uBirch Maven build container"
-RUN apk add openjdk8
-RUN apk add git
-RUN mkdir /opt
+RUN apt-get update
+RUN apt-get --fix-missing install openjdk-8-jdk git -y && \
+    apt-get autoclean && apt-get --purge -y autoremove && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 ADD http://www-us.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz /opt
 WORKDIR /opt
 RUN tar xvfz /opt/apache-maven-3.5.4-bin.tar.gz
