@@ -17,11 +17,13 @@ MAINTAINER Falko Zurell <falko.zurell@ubirch.com>
 
 LABEL description="uBirch Maven build container"
 RUN apt-get update
-RUN apt-get --fix-missing install openjdk-8-jdk -y
-RUN apt-get --fix-missing install maven git -y && \
+RUN apt-get --fix-missing install openjdk-8-jdk git -y && \
     apt-get autoclean && apt-get --purge -y autoremove && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+ADD http://www-us.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz /opt
+WORKDIR /opt
+RUN tar xvfz /opt/apache-maven-3.5.4-bin.tar.gz
 
 RUN git config --system user.name Docker && git config --system user.email docker@localhost
 
@@ -29,6 +31,7 @@ RUN mkdir -p /build && mkdir -p /maven-repo
 VOLUME /build /maven-repo
 WORKDIR /build
 ENV JAVA_HOME /usr
-ENTRYPOINT ["/usr/bin/mvn"]
+ENV PATH /opt/apache-maven-3.5.4/bin:$PATH
+ENTRYPOINT ["/opt/apache-maven-3.5.4/bin/mvn"]
 ENV MAVEN_OPTS=-Dmaven.repo.local=/maven-repo
 CMD ["--help"]
