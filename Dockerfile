@@ -33,5 +33,5 @@ WORKDIR /build
 ENV JAVA_HOME /usr
 ENV PATH /opt/apache-maven-3.5.4/bin:$PATH
 ENTRYPOINT ["/opt/apache-maven-3.5.4/bin/mvn"]
-ENV MAVEN_OPTS=-Dmaven.repo.local=/maven-repo
+ENV MAVEN_OPTS="-Dmaven.repo.local=/maven-repo -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
 CMD ["--help"]
