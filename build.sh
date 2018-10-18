@@ -31,7 +31,7 @@ function test_maven() {
     exit 1
   fi
 
-  docker run -v${PWD}/my-app:/build ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} package
+  docker run --user `id -u`:`id -g` -v${PWD}/my-app:/build ubirch/maven-build:vOpenJDK_${GO_PIPELINE_LABEL} package
   if [ ! $? -eq 0 ]; then
       echo "Maven package failed"
       exit 1
