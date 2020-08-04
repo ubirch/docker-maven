@@ -30,6 +30,8 @@ RUN update-alternatives --install "/usr/bin/java" "java" "${JAVA_HOME}/bin/java"
 
 RUN git config --system user.name Docker && git config --system user.email docker@localhost
 
+RUN apt-get --yes --quiet update && apt-get --yes --quiet install procps
+
 RUN mkdir -p /build && mkdir -p /maven-repo
 VOLUME /build /maven-repo
 WORKDIR /build
