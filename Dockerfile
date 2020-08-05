@@ -17,7 +17,7 @@ ARG JAVA_VERSION=8
 ARG JAVA_HOME=/usr/lib/jvm/java-${JAVA_VERSION}-oracle
 
 LABEL description="uBirch Maven build container"
-RUN apt-get update && apt-get --fix-missing install maven git -y && \
+RUN apt-get update && apt-get --fix-missing --no-install-recommends install procps maven git  -y && \
     apt-get autoclean && apt-get --purge -y autoremove && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -29,8 +29,6 @@ RUN update-alternatives --install "/usr/bin/java" "java" "${JAVA_HOME}/bin/java"
     update-alternatives --set javac "${JAVA_HOME}/bin/javac"
 
 RUN git config --system user.name Docker && git config --system user.email docker@localhost
-
-RUN apt-get --yes --quiet update && apt-get --yes --quiet install procps
 
 RUN mkdir -p /build && mkdir -p /maven-repo
 VOLUME /build /maven-repo
