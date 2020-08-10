@@ -17,7 +17,7 @@ ARG JAVA_VERSION=8
 ARG JAVA_HOME=/usr/lib/jvm/java-${JAVA_VERSION}-oracle
 
 LABEL description="uBirch Maven build container"
-RUN apt-get update && apt-get --fix-missing install maven git -y && \
+RUN apt-get update && apt-get --fix-missing --no-install-recommends install procps maven git  -y && \
     apt-get autoclean && apt-get --purge -y autoremove && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
