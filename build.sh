@@ -53,7 +53,7 @@ function publish_container() {
   if [ $? -eq 0 ]; then
     echo ${NEW_LABEL} > VAR/GO_PIPELINE_NAME_${GO_PIPELINE_NAME}
   else
-    echo "Docker push faild"
+    echo "Docker push failed"
     exit 1
   fi
 
